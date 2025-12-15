@@ -1,0 +1,103 @@
+% ==================== PAQUETES ====================
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\geometry{top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm}
+\usepackage{setspace}
+\onehalfspacing
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage[backend=biber,style=ieee,sorting=none]{biblatex}
+
+% Configuración de Tipografía
+\usepackage[T1]{fontenc}
+\usepackage{helvet}
+\renewcommand*\familydefault{\sfdefault}
+
+
+\sloppy 
+\onehalfspacing
+\setlength{\parskip}{10pt}
+
+% % Configurar encabezados
+% \pagestyle{fancy}
+% \fancyhf{}
+% \fancyhead[LE,RO]{\small\leftmark}    % Muestra el capítulo en lugar de la sección
+% \fancyhead[RE,LO]{\small\thepage}      % Número de página
+% \setlength{\headheight}{13.6pt}
+
+% Configuración de encabezados y pies de página
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Sistema de Predicción de Diabetes}
+\lhead{Cómputo Paralelo - ESCOM IPN}
+\rfoot{\thepage}
+
+% Definir palabras clave
+\newcommand{\keywords}[1]{%
+	\begin{center}
+		\textbf{Palabras clave:} #1
+	\end{center}
+}
+
+\title{TÍTULO DEL REPORTE}
+
+\date{}
+
+\usepackage{listings}
+\usepackage{xcolor}
+
+% \lstset{
+%   language=Python,
+%   backgroundcolor=\color{white},
+%   basicstyle=\ttfamily\small,
+%   keywordstyle=\color{blue},
+%   stringstyle=\color{red!70!black},
+%   commentstyle=\color{gray},
+%   numbers=left,
+%   numberstyle=\tiny\color{gray},
+%   frame=single,
+%   breaklines=true,
+%   showstringspaces=false
+% }
+
+
+
+
+% Configuración de código
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{green!60!black},
+    stringstyle=\color{red},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=10pt,
+    backgroundcolor=\color{gray!10},
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    frame=single,
+    tabsize=2,
+    captionpos=b,
+    breaklines=true,
+    breakatwhitespace=false,
+    escapeinside={\%*}{*)},
+}

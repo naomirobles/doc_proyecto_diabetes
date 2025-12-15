@@ -1,0 +1,264 @@
+\section{Marco Teórico}
+
+\subsection{Diabetes Mellitus: Fundamentos Médicos}
+
+\subsubsection{Definición y Fisiopatología}
+
+La diabetes mellitus es un grupo de trastornos metabólicos caracterizados por hiperglucemia crónica resultante de defectos en la secreción de insulina, la acción de la insulina, o ambos. La insulina, hormona producida por las células beta del páncreas, es esencial para la regulación de la glucosa sanguínea al facilitar la captación de glucosa por células musculares, adiposas y hepáticas.
+
+Existen tres tipos principales de diabetes:
+
+\begin{itemize}
+    \item \textbf{Diabetes Tipo 1:} Enfermedad autoinmune donde el sistema inmunológico destruye las células beta pancreáticas, resultando en deficiencia absoluta de insulina. Representa el 5-10\% de todos los casos.
+    
+    \item \textbf{Diabetes Tipo 2:} Caracterizada por resistencia a la insulina combinada con deficiencia relativa de insulina. Es la forma más común (90-95\% de casos) y está fuertemente asociada con obesidad, sedentarismo y predisposición genética.
+    
+    \item \textbf{Diabetes Gestacional:} Hiperglucemia detectada por primera vez durante el embarazo. Incrementa el riesgo de desarrollar diabetes tipo 2 posteriormente.
+\end{itemize}
+
+\subsubsection{Criterios Diagnósticos}
+
+La American Diabetes Association (ADA) establece los siguientes criterios para diagnóstico:
+
+\begin{table}[H]
+\centering
+\caption{Criterios diagnósticos de diabetes mellitus según ADA 2023}
+\label{tab:criterios_diabetes}
+\begin{tabular}{@{}lc@{}}
+\toprule
+\textbf{Prueba} & \textbf{Valor de Corte} \\ \midrule
+Glucosa en ayunas & $\geq$ 126 mg/dL (7.0 mmol/L) \\
+Hemoglobina glicosilada (HbA1c) & $\geq$ 6.5\% \\
+Glucosa 2h post-carga (75g) & $\geq$ 200 mg/dL (11.1 mmol/L) \\
+Glucosa aleatoria + síntomas & $\geq$ 200 mg/dL (11.1 mmol/L) \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Factores de Riesgo}
+
+Los principales factores de riesgo para diabetes tipo 2 incluyen:
+
+\begin{enumerate}
+    \item \textbf{No modificables:}
+    \begin{itemize}
+        \item Edad $>$ 45 años
+        \item Historia familiar de diabetes
+        \item Etnicidad (mayor prevalencia en poblaciones afroamericanas, hispanas, indígenas americanas, asiáticas)
+        \item Historia de diabetes gestacional
+    \end{itemize}
+    
+    \item \textbf{Modificables:}
+    \begin{itemize}
+        \item Sobrepeso u obesidad (BMI $\geq$ 25 kg/m²)
+        \item Sedentarismo
+        \item Hipertensión arterial
+        \item Dislipidemia (colesterol HDL bajo, triglicéridos elevados)
+        \item Síndrome de ovario poliquístico
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Aprendizaje Automático Supervisado}
+
+\subsubsection{Definición y Taxonomía}
+
+El aprendizaje automático supervisado es una rama de la inteligencia artificial donde un algoritmo aprende a mapear entradas $X$ a salidas $Y$ mediante un conjunto de ejemplos etiquetados $\{(x_i, y_i)\}_{i=1}^{N}$. El objetivo es encontrar una función $f: X \rightarrow Y$ que generalice correctamente a datos no vistos.
+
+En problemas de clasificación binaria (como predicción de diabetes), la variable objetivo $Y \in \{0, 1\}$ representa ausencia o presencia de la condición. Formalmente:
+
+\begin{equation}
+\hat{y} = f(x; \theta)
+\end{equation}
+
+donde $\theta$ son los parámetros del modelo aprendidos mediante optimización de una función de pérdida $\mathcal{L}$:
+
+\begin{equation}
+\theta^* = \arg\min_{\theta} \frac{1}{N} \sum_{i=1}^{N} \mathcal{L}(y_i, f(x_i; \theta)) + \lambda R(\theta)
+\end{equation}
+
+con $R(\theta)$ siendo un término de regularización que previene sobreajuste.
+
+\subsubsection{Algoritmos de Clasificación}
+
+\paragraph{Random Forest}
+
+Random Forest es un método de ensemble que construye múltiples árboles de decisión durante el entrenamiento y combina sus predicciones mediante votación (clasificación) o promedio (regresión). Introducido por Breiman (2001), reduce la varianza inherente a árboles individuales mediante dos mecanismos de aleatorización:
+
+\begin{enumerate}
+    \item \textbf{Bagging:} Cada árbol se entrena con un subconjunto aleatorio de datos obtenido mediante muestreo con reemplazo.
+    \item \textbf{Feature randomness:} En cada división de nodo, solo un subconjunto aleatorio de características se considera para encontrar la mejor división.
+\end{enumerate}
+
+La predicción final para clasificación binaria es:
+
+\begin{equation}
+\hat{y} = \text{mode}\{h_t(x)\}_{t=1}^{T}
+\end{equation}
+
+donde $T$ es el número de árboles y $h_t$ es la predicción del árbol $t$.
+
+\paragraph{XGBoost (Extreme Gradient Boosting)}
+
+XGBoost implementa gradient boosting, una técnica de ensemble que construye modelos secuencialmente, donde cada nuevo modelo corrige errores de los anteriores. El algoritmo minimiza una función objetivo regularizada:
+
+\begin{equation}
+\mathcal{L}(\phi) = \sum_{i} l(\hat{y}_i, y_i) + \sum_{k} \Omega(f_k)
+\end{equation}
+
+donde $l$ es una función de pérdida diferenciable, $\Omega(f_k) = \gamma T + \frac{1}{2}\lambda \|\omega\|^2$ penaliza la complejidad del árbol (número de hojas $T$ y magnitud de pesos $\omega$). XGBoost incorpora optimizaciones como:
+
+\begin{itemize}
+    \item Regularización L1 y L2 para prevenir sobreajuste
+    \item Manejo nativo de valores faltantes
+    \item Paralelización de construcción de árboles
+    \item Poda basada en ganancia máxima
+\end{itemize}
+
+\paragraph{Support Vector Machine (SVM)}
+
+SVM busca el hiperplano óptimo que maximiza el margen entre clases. Para datos no linealmente separables, utiliza el kernel trick para mapear implícitamente datos a un espacio de mayor dimensionalidad. El problema de optimización es:
+
+\begin{equation}
+\min_{w,b,\xi} \frac{1}{2}\|w\|^2 + C\sum_{i=1}^{N}\xi_i
+\end{equation}
+
+sujeto a:
+\begin{equation}
+y_i(w^T\phi(x_i) + b) \geq 1 - \xi_i, \quad \xi_i \geq 0
+\end{equation}
+
+donde $\phi$ es el mapeo al espacio de características, $C$ es el parámetro de regularización y $\xi_i$ son las variables de holgura. El kernel RBF (Radial Basis Function) es comúnmente usado:
+
+\begin{equation}
+K(x_i, x_j) = \exp(-\gamma \|x_i - x_j\|^2)
+\end{equation}
+
+\paragraph{Regresión Logística}
+
+A pesar de su nombre, es un algoritmo de clasificación que modela la probabilidad de pertenencia a una clase mediante la función logística:
+
+\begin{equation}
+P(Y=1|x) = \frac{1}{1 + e^{-(\beta_0 + \beta^T x)}}
+\end{equation}
+
+Los parámetros $\beta$ se estiman maximizando la log-verosimilitud:
+
+\begin{equation}
+\max_{\beta} \sum_{i=1}^{N} [y_i \log(\hat{p}_i) + (1-y_i)\log(1-\hat{p}_i)]
+\end{equation}
+
+\paragraph{Redes Neuronales Artificiales (ANN)}
+
+Multilayer Perceptron (MLP) es la arquitectura de red neuronal feedforward más básica. Para clasificación binaria, típicamente consiste en:
+
+\begin{itemize}
+    \item Capa de entrada con $d$ neuronas (dimensión de características)
+    \item Capas ocultas con activaciones no lineales (ReLU, sigmoid, tanh)
+    \item Capa de salida con 1 neurona y activación sigmoid
+\end{itemize}
+
+La propagación forward se define como:
+
+\begin{align}
+h^{(1)} &= \sigma(W^{(1)}x + b^{(1)}) \\
+h^{(2)} &= \sigma(W^{(2)}h^{(1)} + b^{(2)}) \\
+\hat{y} &= \text{sigmoid}(W^{(out)}h^{(L)} + b^{(out)})
+\end{align}
+
+El entrenamiento usa backpropagation con optimizadores como Adam o SGD.
+
+\paragraph{Gradient Boosting}
+
+Similar a XGBoost pero con implementación de scikit-learn. Construye modelos aditivamente:
+
+\begin{equation}
+F_m(x) = F_{m-1}(x) + \gamma_m h_m(x)
+\end{equation}
+
+donde $h_m$ es un árbol débil que aproxima el gradiente negativo de la función de pérdida.
+
+\subsubsection{Ensemble Learning}
+
+Los métodos de ensemble combinan múltiples modelos para mejorar rendimiento. Principales estrategias:
+
+\begin{itemize}
+    \item \textbf{Voting:} Combinación por votación mayoritaria (hard) o promedio de probabilidades (soft).
+    \item \textbf{Stacking:} Un meta-modelo aprende a combinar predicciones de modelos base.
+    \item \textbf{Boosting:} Modelos secuenciales que corrigen errores previos (AdaBoost, XGBoost).
+    \item \textbf{Bagging:} Modelos paralelos entrenados con subconjuntos de datos (Random Forest).
+\end{itemize}
+
+En este proyecto, usamos \textit{soft voting} con promedio simple:
+
+\begin{equation}
+P_{\text{ensemble}}(Y=1|x) = \frac{1}{M}\sum_{m=1}^{M} P_m(Y=1|x)
+\end{equation}
+
+\subsection{Métricas de Evaluación}
+
+Para problemas de clasificación binaria desbalanceada (como diabetes), las métricas estándar incluyen:
+
+\begin{table}[H]
+\centering
+\caption{Matriz de confusión}
+\label{tab:confusion_matrix}
+\begin{tabular}{cc|cc}
+\multicolumn{2}{c|}{} & \multicolumn{2}{c}{\textbf{Predicción}} \\
+& & Positivo & Negativo \\ \hline
+\multirow{2}{*}{\textbf{Real}} & Positivo & TP & FN \\
+& Negativo & FP & TN
+\end{tabular}
+\end{table}
+
+\begin{itemize}
+    \item \textbf{Exactitud (Accuracy):} $\frac{TP + TN}{TP + TN + FP + FN}$
+    \item \textbf{Precisión (Precision):} $\frac{TP}{TP + FP}$ - Proporción de predicciones positivas correctas
+    \item \textbf{Sensibilidad (Recall/Sensitivity):} $\frac{TP}{TP + FN}$ - Proporción de casos positivos detectados
+    \item \textbf{F1-Score:} $2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}$ - Media armónica de precisión y recall
+    \item \textbf{AUC-ROC:} Área bajo la curva ROC, mide capacidad discriminativa del modelo
+\end{itemize}
+
+En contexto médico, el recall (sensibilidad) es crítico para minimizar falsos negativos (pacientes con diabetes no detectados).
+
+\subsection{Cómputo Paralelo}
+
+\subsubsection{Ley de Amdahl}
+
+La Ley de Amdahl cuantifica la aceleración teórica máxima al paralelizar un programa:
+
+\begin{equation}
+S(n) = \frac{1}{(1-p) + \frac{p}{n}}
+\end{equation}
+
+donde $p$ es la fracción paralelizable del código y $n$ el número de procesadores. Implica que el speedup está limitado por la porción serial.
+
+\subsubsection{Threading vs Multiprocessing en Python}
+
+\paragraph{Global Interpreter Lock (GIL)}
+
+Python utiliza un GIL que permite solo un thread ejecutar bytecode a la vez. Esto limita threading para tareas CPU-bound, pero es eficiente para I/O-bound. Sin embargo, bibliotecas como NumPy, scikit-learn y XGBoost liberan el GIL durante operaciones intensivas, permitiendo paralelismo efectivo.
+
+\paragraph{ThreadPoolExecutor}
+
+\texttt{concurrent.futures.ThreadPoolExecutor} proporciona una interfaz de alto nivel para ejecutar funciones asíncronamente mediante threads:
+
+\begin{lstlisting}[language=Python, caption=Ejemplo de ThreadPoolExecutor]
+from concurrent.futures import ThreadPoolExecutor
+
+def predict_model(model, data):
+    return model.predict_proba(data)
+
+with ThreadPoolExecutor(max_workers=6) as executor:
+    futures = [executor.submit(predict_model, m, X) 
+               for m in models]
+    results = [f.result() for f in futures]
+\end{lstlisting}
+
+\subsubsection{Métricas de Rendimiento Paralelo}
+
+\begin{itemize}
+    \item \textbf{Speedup:} $S = \frac{T_{\text{serial}}}{T_{\text{parallel}}}$
+    \item \textbf{Eficiencia:} $E = \frac{S}{n} \times 100\%$ donde $n$ es el número de workers
+    \item \textbf{Overhead:} Tiempo adicional debido a sincronización, creación de threads, etc.
+\end{itemize}
+
+\newpage

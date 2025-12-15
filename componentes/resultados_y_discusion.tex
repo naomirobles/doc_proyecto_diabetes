@@ -1,0 +1,44 @@
+% ==================== RESULTADOS Y DISCUSIÓN ====================
+\section{Resultados y Discusión}
+\subsection{Desempeño de Clasificación}
+Durante las pruebas de estrés del sistema de predicción, se observó un fenómeno contraintuitivo: al establecer todas las variables clínicas (glucosa, insulina, BMI, etc.) en sus valores máximos posibles, la predicción de riesgo agregada (ensemble) resultó en un riesgo `` Medio''  ($\approx 60\%$), en lugar de un riesgo `` Alto''  o `` Crítico'' ($>90\%$).
+
+\subsubsection{Análisis del Comportamiento por Modelo}
+Al descomponer la predicción individual de cada modelo ante una entrada extrema $X_{max}$ (e.g., Glucosa=200, Insulina=900), se observaron divergencias significativas:
+
+\subsubsection{Modelos que acertaron (Riesgo $>99\%$)}
+\begin{itemize}
+    \item \textbf{Logistic Regression:} Al ser un modelo lineal, extrapola linealmente. Si el coeficiente de glucosa es positivo, un valor de glucosa extremo resultará en una probabilidad asintótica a 1.
+    \item \textbf{Neural Network (MLP):} Dependiendo de la función de activación (ReLU/Sigmoid), las redes neuronales a menudo mantienen la tendencia de la pendiente en regiones fuera de la distribución de entrenamiento.
+\end{itemize}
+
+\subsubsection{Modelos que fallaron (Riesgo $20\% - 50\%$)}
+\begin{itemize}
+    \item \textbf{Tree-based Models (Random Forest, Gradient Boosting, XGBoost):}
+    Los árboles de decisión son \textit{modelos no paramétricos} que particionan el espacio de características. No pueden extrapolar.
+    \textit{Causa Raíz:} Si el valor máximo de "Glucosa" visto en el entrenamiento fue 199, y la nueva entrada es 200, el árbol la asignará a la misma hoja que 199. Sin embargo, en dimensiones altas, una combinación de \textit{todos} los máximos puede caer en una región del espacio vectorial vacía de datos de entrenamiento. Si las hojas más cercanas en esa región contenían casos negativos (o ruido), el árbol predecirá un riesgo bajo erróneamente.
+    \item \textbf{SVM (RBF Kernel):} El kernel de Base Radial (Gaussiano) depende de la distancia a los vectores de soporte. Si el punto de entrada está muy lejos de cualquier vector de soporte conocido (un outlier extremo), el valor del kernel tiende a cero, y la predicción puede revertir al sesgo (bias) del modelo, que a menudo es la clase mayoritaria (negativa/sano).
+\end{itemize}
+
+\subsubsection{El Problema del Promedio}
+La estrategia original de ensemble utilizaba un promedio ponderado.
+$$ P_{ensemble} = \frac{\sum w_i \cdot P_i}{\sum w_i} $$
+Dado que los modelos basados en árboles (que fallaron) tenían pesos altos por su precisión general ($w_{xgboost}=2.0$), arrastraron hacia abajo la predicción correcta de la regresión logística ($w_{logreg}=0.8$), resultando en un falso negativo peligroso.
+
+\subsubsection{Solución Implementada: Red de Seguridad}
+Para mitigar este riesgo en entornos médicos, se implementó una lógica de "Safety Net" basada en el \textit{Principio de Precaución}:
+
+\begin{lstlisting}[language=Python, frame=single, caption=Lógica de Safety Net]
+# Si algun modelo detecta riesgo critico (>0.85) 
+# pero el promedio lo oculta:
+max_prob = max(results.values())
+if max_prob > 0.85 and ensemble_prob < max_prob:
+    # Forzamos el ensemble hacia el maximo detectado
+    ensemble_prob = (ensemble_prob + max_prob) / 2
+\end{lstlisting}
+
+Esta modificación asegura que la "alarma" de un modelo lineal capaz de extrapolar no sea silenciada por la incapacidad de los modelos no lineales de generalizar fuera de su dominio conocido.
+\\\\
+En sistemas de ML críticos, la métrica de \textit{Accuracy} global es insuficiente. Es vital auditar el comportamiento en los límites (boundary testing). La combinación de modelos con diferentes sesgos inductivos (lineales vs. no lineales) junto con reglas heurísticas de seguridad es esencial para la robustez.
+
+\subsection{Análisis de Rendimiento Paralelo}

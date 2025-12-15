@@ -1,0 +1,110 @@
+\section{Introducción}
+
+\subsection{Contexto y Motivación}
+
+La diabetes mellitus es una enfermedad metabólica crónica caracterizada por niveles elevados de glucosa en sangre, resultante de defectos en la secreción de insulina, su acción, o ambos. Según datos de la Organización Mundial de la Salud (OMS, 2023), la prevalencia global de diabetes ha aumentado dramáticamente en las últimas décadas, pasando de 108 millones de personas en 1980 a 537 millones en 2021, con proyecciones que estiman 783 millones de casos para 2045 \cite{idf2021}.
+
+En México, el panorama es particularmente preocupante. De acuerdo con la Encuesta Nacional de Salud y Nutrición (ENSANUT) 2022, el 18.3\% de la población adulta mexicana vive con diabetes, posicionando al país como el séptimo a nivel mundial en número de casos \cite{ensanut2022}. Esta enfermedad representa la segunda causa de muerte en México, con más de 140,000 defunciones anuales directamente atribuibles a complicaciones diabéticas. El impacto económico es igualmente significativo: se estima que el costo anual de atención médica para diabetes en México supera los 85,000 millones de pesos (IMSS, 2023), considerando hospitalización, medicamentos, tratamiento de complicaciones y pérdida de productividad laboral.
+
+El diagnóstico temprano de diabetes es crucial para prevenir complicaciones graves como retinopatía diabética, nefropatía, neuropatía, enfermedad cardiovascular y amputaciones. Sin embargo, aproximadamente el 40-50\% de las personas con diabetes tipo 2 permanecen sin diagnosticar debido a que la enfermedad puede ser asintomática en etapas tempranas \cite{who2023}. Los métodos de detección tradicionales requieren pruebas de laboratorio como hemoglobina glicosilada (HbA1c) o pruebas de tolerancia a la glucosa oral, las cuales implican costos, tiempo de espera y acceso limitado en comunidades rurales o de bajos recursos.
+
+\subsection{Inteligencia Artificial en Diagnóstico Médico}
+
+El aprendizaje automático (Machine Learning, ML) ha demostrado un potencial transformador en el campo del diagnóstico médico asistido. Algoritmos de clasificación entrenados con datos clínicos históricos pueden identificar patrones complejos y no lineales que correlacionan variables fisiológicas con el riesgo de enfermedad. En el caso específico de diabetes, múltiples estudios han reportado que modelos de ML pueden alcanzar precisiones diagnósticas comparables o superiores a métodos de detección convencionales \cite{zou2018, dinh2019}.
+
+Los enfoques de \textit{ensemble learning} (aprendizaje en conjunto) han ganado particular relevancia, ya que combinan las predicciones de múltiples modelos base para mejorar robustez y generalización. Técnicas como Random Forest, Gradient Boosting y XGBoost han mostrado desempeño superior en diversos problemas de clasificación médica \cite{chen2016xgboost}. Sin embargo, ejecutar múltiples modelos secuencialmente introduce latencia computacional que puede ser prohibitiva en escenarios de tiempo real o alta demanda.
+
+\subsection{Cómputo Paralelo en Aplicaciones Médicas}
+
+El procesamiento paralelo emerge como una solución natural para reducir el tiempo de inferencia en sistemas de ensemble learning. Al distribuir la carga computacional entre múltiples unidades de procesamiento (threads, procesos, GPUs), es posible acelerar significativamente el pipeline de predicción sin sacrificar precisión. Python ofrece diversas herramientas para paralelización, destacando:
+
+\begin{itemize}
+    \item \texttt{threading}: Paralelismo ligero basado en hilos, ideal para tareas I/O-bound o modelos preentrenados.
+    \item \texttt{multiprocessing}: Paralelismo real mediante procesos independientes, superando el Global Interpreter Lock (GIL).
+    \item \texttt{concurrent.futures}: Abstracción de alto nivel que simplifica la gestión de pools de threads/procesos.
+    \item \texttt{CUDA/CuPy}: Aceleración masivamente paralela mediante GPUs para operaciones matriciales.
+\end{itemize}
+
+Para el contexto de este proyecto, donde los modelos ya están entrenados y la tarea principal es inferencia rápida, el uso de \texttt{ThreadPoolExecutor} resulta apropiado debido a que las bibliotecas de ML (scikit-learn, XGBoost) liberan el GIL durante operaciones de predicción \cite{python_gil}.
+
+\subsection{Objetivos del Proyecto}
+
+El presente trabajo tiene como objetivo general desarrollar un sistema de predicción de diabetes que integre técnicas de aprendizaje automático con procesamiento paralelo, proporcionando una herramienta de tamizaje accesible, rápida y precisa para uso en entornos clínicos o comunitarios.
+
+\subsubsection{Objetivos Específicos}
+
+\begin{enumerate}
+    \item Diseñar e implementar un pipeline de procesamiento de datos para el dataset Pima Indians Diabetes, incluyendo limpieza, normalización y balanceo de clases.
+    
+    \item Entrenar y optimizar seis algoritmos de clasificación: Random Forest, XGBoost, Support Vector Machine (SVM), Regresión Logística, Redes Neuronales Artificiales (ANN) y Gradient Boosting, utilizando técnicas de grid search y validación cruzada.
+    
+    \item Desarrollar una arquitectura de ensemble paralelo basada en \texttt{ThreadPoolExecutor} que ejecute inferencias de múltiples modelos concurrentemente y agregue sus predicciones mediante promedio ponderado.
+    
+    \item Implementar una interfaz gráfica interactiva usando Streamlit y Plotly que permita a usuarios no técnicos ingresar datos de pacientes y obtener predicciones con visualizaciones interpretables (gauge charts, gráficos de comparación, análisis de importancia de características).
+    
+    \item Realizar un análisis comparativo exhaustivo del desempeño computacional entre ejecución secuencial y paralela, midiendo tiempos de inferencia, speedup, eficiencia y escalabilidad.
+    
+    \item Evaluar la precisión, recall, F1-score y AUC-ROC de cada modelo individual y del ensemble final, validando la calidad diagnóstica del sistema.
+    
+    \item Documentar completamente el proceso de desarrollo, metodología experimental y resultados obtenidos en formato de reporte técnico académico.
+\end{enumerate}
+
+\subsection{Justificación}
+
+La relevancia de este proyecto se sustenta en múltiples dimensiones:
+
+\textbf{Impacto en Salud Pública:} Un sistema de detección temprana accesible y de bajo costo puede contribuir significativamente a reducir la carga de enfermedad diabética, especialmente en regiones con acceso limitado a servicios de laboratorio especializados.
+
+\textbf{Innovación Técnica:} La combinación de ensemble learning con procesamiento paralelo representa un enfoque novedoso que equilibra precisión diagnóstica con eficiencia computacional, un requisito crítico para aplicaciones médicas en tiempo real.
+
+\textbf{Transferibilidad:} La arquitectura propuesta es generalizable a otros problemas de clasificación médica (enfermedad cardiovascular, cáncer, enfermedades respiratorias) donde múltiples modelos deben ejecutarse para tomar decisiones críticas.
+
+\textbf{Formación Académica:} Este proyecto integra conocimientos de múltiples áreas del currículo de Ingeniería en Inteligencia Artificial: aprendizaje automático, cómputo paralelo, desarrollo de software, procesamiento de datos y ética en IA médica.
+
+\textbf{Viabilidad Económica:} El sistema completo puede ejecutarse en hardware commodity (computadoras personales con CPU multi-core) sin requerir infraestructura especializada, reduciendo barreras de adopción para instituciones con presupuestos limitados.
+
+\subsection{Alcances y Limitaciones}
+
+\subsubsection{Alcances}
+
+\begin{itemize}
+    \item Sistema funcional de predicción de diabetes con interfaz gráfica profesional.
+    \item Procesamiento paralelo de inferencias mediante threading en Python.
+    \item Análisis comparativo de seis algoritmos de clasificación.
+    \item Visualizaciones interactivas y explicabilidad mediante feature importance.
+    \item Documentación completa del código y metodología.
+    \item Evaluación de métricas de rendimiento computacional y precisión diagnóstica.
+\end{itemize}
+
+\subsubsection{Limitaciones}
+
+\begin{itemize}
+    \item El dataset utilizado (Pima Indians) contiene únicamente población femenina de ascendencia indígena Pima, limitando la generalización a otras poblaciones.
+    \item El sistema no reemplaza el diagnóstico médico profesional; es una herramienta de apoyo para tamizaje inicial.
+    \item El paralelismo mediante threading está sujeto al GIL de Python, lo que limita el speedup teórico máximo.
+    \item No se implementa procesamiento en GPU (CUDA) debido a que los modelos son lo suficientemente rápidos en CPU.
+    \item La interfaz está en español y no incluye internacionalización.
+    \item No se contempla integración con sistemas de historiales clínicos electrónicos (EHR).
+\end{itemize}
+
+\subsection{Organización del Documento}
+
+El resto de este reporte está organizado de la siguiente manera:
+
+\begin{itemize}
+    \item \textbf{Capítulo 2 - Marco Teórico:} Revisión de conceptos fundamentales de diabetes mellitus, aprendizaje automático, ensemble learning y cómputo paralelo.
+    
+    \item \textbf{Capítulo 3 - Estado del Arte:} Análisis de trabajos relacionados en predicción de diabetes con ML y aplicaciones de paralelismo en diagnóstico médico.
+    
+    \item \textbf{Capítulo 4 - Metodología:} Descripción detallada del dataset, preprocesamiento, arquitectura del sistema, algoritmos implementados y herramientas utilizadas.
+    
+    \item \textbf{Capítulo 5 - Análisis Comparativo:} Evaluación de desempeño de modelos individuales, comparación de arquitecturas paralelas vs secuenciales, y análisis de métricas.
+    
+    \item \textbf{Capítulo 6 - Caso de Aplicación:} Escenario de uso real en clínica comunitaria, requerimientos de sistema y propuesta de transferencia tecnológica.
+    
+    \item \textbf{Capítulo 7 - Resultados y Discusión:} Presentación de resultados experimentales, análisis de hallazgos, ventajas y limitaciones.
+    
+    \item \textbf{Capítulo 8 - Conclusiones y Trabajo Futuro:} Síntesis de aprendizajes, recomendaciones para implementación y líneas de investigación futuras.
+\end{itemize}
+
+\newpage

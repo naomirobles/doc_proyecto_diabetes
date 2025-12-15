@@ -1,0 +1,411 @@
+\section{Metodología de Investigación}
+
+\subsection{Dataset: Pima Indians Diabetes}
+
+\subsubsection{Descripción}
+
+El dataset Pima Indians Diabetes fue recolectado por el National Institute of Diabetes and Digestive and Kidney Diseases (NIDDK) y donado al UCI Machine Learning Repository en 1988. Contiene información médica de 768 mujeres de la tribu Pima (Arizona, USA) con al menos 21 años de edad.
+
+\begin{table}[H]
+\centering
+\caption{Características del dataset Pima Indians Diabetes}
+\label{tab:dataset_features}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Feature} & \textbf{Descripción} & \textbf{Rango} \\ \midrule
+Pregnancies & Número de embarazos & 0-17 \\
+Glucose & Glucosa plasmática (mg/dL) & 0-199 \\
+BloodPressure & Presión arterial diastólica (mm Hg) & 0-122 \\
+SkinThickness & Grosor pliegue cutáneo tricipital (mm) & 0-99 \\
+Insulin & Insulina sérica 2h (μU/mL) & 0-846 \\
+BMI & Índice de masa corporal (kg/m²) & 0-67.1 \\
+DiabetesPedigreeFunction & Factor hereditario & 0.078-2.42 \\
+Age & Edad (años) & 21-81 \\
+Outcome & Diabetes (1) o No (0) & 0 o 1 \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Análisis Exploratorio}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{img/class_distribution.png}
+\caption{Distribución de clases en el dataset. 500 casos negativos (65\%) vs 268 positivos (35\%), evidenciando desbalance moderado.}
+\label{fig:class_dist}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{Estadísticas descriptivas del dataset}
+\label{tab:dataset_stats}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Feature} & \textbf{Media} & \textbf{Std} & \textbf{Min} & \textbf{Max} \\ \midrule
+Pregnancies & 3.85 & 3.37 & 0 & 17 \\
+Glucose & 120.89 & 31.97 & 0 & 199 \\
+BloodPressure & 69.11 & 19.36 & 0 & 122 \\
+SkinThickness & 20.54 & 15.95 & 0 & 99 \\
+Insulin & 79.80 & 115.24 & 0 & 846 \\
+BMI & 31.99 & 7.88 & 0 & 67.1 \\
+DiabetesPedigreeFunction & 0.47 & 0.33 & 0.078 & 2.42 \\
+Age & 33.24 & 11.76 & 21 & 81 \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Observaciones clave:}
+\begin{itemize}
+    \item 49.2\% de registros contienen valores cero en Insulin, indicando datos faltantes.
+    \item 29.6\% tienen Glucose = 0, biológicamente imposible (valores faltantes codificados).
+    \item 35.5\% tienen BloodPressure = 0.
+    \item BMI presenta valores extremos (outliers $>$ 50).
+\end{itemize}
+
+\subsection{Preprocesamiento de Datos}
+
+\subsubsection{Pipeline de Limpieza}
+
+\begin{algorithm}[H]
+\caption{Pipeline de preprocesamiento}
+\label{alg:preprocessing}
+\begin{algorithmic}[1]
+\State \textbf{Input:} Dataset crudo $D_{raw}$
+\State \textbf{Output:} Dataset procesado $D_{clean}$
+\State
+\State \textit{// Paso 1: Manejo de valores faltantes}
+\For{each feature $f$ in [Glucose, BloodPressure, SkinThickness, Insulin, BMI]}
+    \State Reemplazar $f == 0$ con $\texttt{NaN}$
+    \State Imputar $\texttt{NaN}$ con mediana de $f$ agrupada por clase (Outcome)
+\EndFor
+\State
+\State \textit{// Paso 2: Detección y corrección de outliers}
+\For{each feature $f$}
+    \State Calcular $Q1$, $Q3$, $IQR = Q3 - Q1$
+    \State Identificar outliers: $f < Q1 - 1.5 \cdot IQR$ o $f > Q3 + 1.5 \cdot IQR$
+    \State Winsorizar: reemplazar outliers con $Q1 - 1.5 \cdot IQR$ o $Q3 + 1.5 \cdot IQR$
+\EndFor
+\State
+\State \textit{// Paso 3: Normalización}
+\State $D_{scaled} \gets \texttt{StandardScaler}(D_{clean})$
+\State
+\State \textit{// Paso 4: Split train-test estratificado}
+\State $D_{train}, D_{test} \gets \texttt{train\_test\_split}(D_{scaled}, \text{test\_size}=0.2, \text{stratify}=\text{Outcome})$
+\State
+\State \textit{// Paso 5: Balanceo con SMOTE (solo train)}
+\State $D_{train} \gets \texttt{SMOTE}(D_{train})$
+\State
+\State \textbf{return} $D_{train}, D_{test}$
+\end{algorithmic}
+\end{algorithm}
+
+\subsubsection{SMOTE (Synthetic Minority Over-sampling Technique)}
+
+Para abordar el desbalance de clases (65\% negativos vs 35\% positivos), aplicamos SMOTE que genera ejemplos sintéticos de la clase minoritaria mediante interpolación:
+
+\begin{equation}
+x_{new} = x_i + \lambda \cdot (x_{k} - x_i)
+\end{equation}
+
+donde $x_i$ es un ejemplo de la clase minoritaria, $x_k$ es uno de sus $k$ vecinos más cercanos, y $\lambda \sim U(0,1)$.
+
+\textbf{Parámetros SMOTE:}
+\begin{itemize}
+    \item $k = 5$ vecinos
+    \item Ratio de balanceo: 1.0 (equilibrar ambas clases)
+    \item Solo aplicado a conjunto de entrenamiento para evitar data leakage
+\end{itemize}
+
+\subsection{Arquitectura del Sistema}
+
+\subsubsection{Diagrama General}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{system_architecture.png}
+\caption{Arquitectura general del sistema de predicción de diabetes. El flujo inicia con entrada de usuario, procesamiento paralelo de modelos, agregación ensemble y visualización interactiva.}
+\label{fig:architecture}
+\end{figure}
+
+\subsubsection{Componentes Principales}
+
+\paragraph{Módulo de Entrenamiento (\texttt{train\_models.py})}
+
+Responsable de:
+\begin{itemize}
+    \item Carga y preprocesamiento del dataset
+    \item Entrenamiento de 6 modelos con optimización de hiperparámetros
+    \item Evaluación y métricas de desempeño
+    \item Serialización de modelos entrenados (formato \texttt{.pkl})
+\end{itemize}
+
+\paragraph{Módulo de Predicción Paralela (\texttt{predictor.py})}
+
+Implementa la clase \texttt{ParallelPredictor} con métodos:
+
+\begin{lstlisting}[language=Python, caption=Clase ParallelPredictor - Estructura]
+class ParallelPredictor:
+    def __init__(self, models_dir):
+        """Carga modelos pre-entrenados y scaler"""
+        self.models = {
+            'random_forest': joblib.load(...),
+            'xgboost': joblib.load(...),
+            # ... otros modelos
+        }
+        self.scaler = joblib.load(...)
+    
+    def predict_single_model(self, model_name, model, X):
+        """Ejecuta prediccion en un thread separado"""
+        probability = model.predict_proba(X)[0][1]
+        return {'model': model_name, 'probability': probability}
+    
+    def predict_parallel(self, input_data):
+        """Coordina ejecucion paralela con ThreadPoolExecutor"""
+        X = self.scaler.transform(input_data)
+        with ThreadPoolExecutor(max_workers=6) as executor:
+            futures = {executor.submit(...): name 
+                      for name, model in self.models.items()}
+            results = [f.result() for f in as_completed(futures)]
+        return aggregate_results(results)
+\end{lstlisting}
+
+\paragraph{Módulo de Visualización (\texttt{visualizations.py})}
+
+Funciones para generar gráficos Plotly:
+\begin{itemize}
+    \item \texttt{create\_gauge\_chart()}: Indicador de riesgo tipo velocímetro
+    \item \texttt{create\_model\_comparison\_chart()}: Barras comparativas entre modelos
+    \item \texttt{create\_feature\_importance\_chart()}: Importancia de características
+    \item \texttt{create\_radar\_chart()}: Comparación paciente vs promedio poblacional
+    \item \texttt{create\_performance\_comparison\_chart()}: Speedup paralelo vs secuencial
+\end{itemize}
+
+\paragraph{Interfaz Streamlit (\texttt{app.py})}
+
+Aplicación web con:
+\begin{itemize}
+    \item Sidebar para entrada de datos del paciente (sliders, inputs numéricos)
+    \item Panel principal con métricas clave (riesgo, confianza, mejor modelo, tiempo)
+    \item Visualizaciones interactivas sincronizadas
+    \item Recomendaciones médicas automáticas basadas en predicción
+    \item Modo comparación de rendimiento paralelo
+\end{itemize}
+
+\subsection{Entrenamiento de Modelos}
+
+\subsubsection{Optimización de Hiperparámetros}
+
+Utilizamos \texttt{GridSearchCV} con validación cruzada 5-fold para cada algoritmo.
+
+\paragraph{Random Forest}
+\begin{lstlisting}[language=Python, caption=Grid Search - Random Forest]
+param_grid_rf = {
+    'n_estimators': [100, 200, 300],
+    'max_depth': [10, 20, None],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 4],
+    'max_features': ['sqrt', 'log2']
+}
+\end{lstlisting}
+
+\textbf{Mejores parámetros:} \texttt{n\_estimators=200, max\_depth=20, min\_samples\_split=2, max\_features='sqrt'}
+
+\paragraph{XGBoost}
+\begin{lstlisting}[language=Python, caption=Configuración XGBoost]
+xgb_model = XGBClassifier(
+    n_estimators=200,
+    max_depth=6,
+    learning_rate=0.1,
+    subsample=0.8,
+    colsample_bytree=0.8,
+    gamma=0.1,
+    reg_alpha=0.1,  # L1 regularization
+    reg_lambda=1.0,  # L2 regularization
+    scale_pos_weight=1.5  # Balance classes
+)
+\end{lstlisting}
+
+\paragraph{SVM}
+\begin{lstlisting}[language=Python, caption=Grid Search - SVM]
+param_grid_svm = {
+    'C': [0.1, 1, 10],
+    'gamma': ['scale', 'auto', 0.001, 0.01],
+    'kernel': ['rbf']
+}
+\end{lstlisting}
+
+\textbf{Mejores parámetros:} \texttt{C=1, gamma='scale', kernel='rbf'}
+
+\paragraph{Redes Neuronales (MLP)}
+\begin{lstlisting}[language=Python, caption=Configuración MLP]
+mlp_model = MLPClassifier(
+    hidden_layer_sizes=(100, 50),
+    activation='relu',
+    solver='adam',
+    alpha=0.001,  # L2 penalty
+    learning_rate_init=0.001,
+    max_iter=500,
+    early_stopping=True,
+    validation_fraction=0.1
+)
+\end{lstlisting}
+
+\subsubsection{Validación Cruzada}
+
+Estrategia 5-fold stratified cross-validation para asegurar representación proporcional de clases en cada fold.
+
+\begin{equation}
+\text{CV-Score} = \frac{1}{K}\sum_{k=1}^{K} \text{Metric}(y_k, \hat{y}_k)
+\end{equation}
+
+donde $K=5$ folds, $y_k$ son etiquetas reales del fold $k$ y $\hat{y}_k$ predicciones.
+
+\subsection{Implementación de Threading}
+
+\subsubsection{Arquitectura de Predicción Paralela}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{threading_architecture.png}
+\caption{Flujo de ejecución paralela con ThreadPoolExecutor. El hilo principal coordina, mientras workers ejecutan inferencias concurrentemente.}
+\label{fig:threading}
+\end{figure}
+
+\subsubsection{Justificación de Threading vs Multiprocessing}
+
+\begin{table}[H]
+\centering
+\caption{Comparación Threading vs Multiprocessing para este proyecto}
+\label{tab:threading_vs_mp}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Criterio} & \textbf{Threading} & \textbf{Multiprocessing} \\ \midrule
+Overhead de creación & Bajo ($\sim$0.1ms) & Alto ($\sim$10-50ms) \\
+Memoria compartida & Sí (modelos cargados 1x) & No (copias por proceso) \\
+Compatibilidad GIL & Limitada (CPU-bound) & Sin restricción \\
+Complejidad código & Baja & Media \\
+Overhead comunicación & Mínimo & Alto (IPC, serialización) \\ \midrule
+\textbf{Adecuado para:} & Inferencia rápida ($<$10ms) & Entrenamiento pesado \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Decisión:} Threading es óptimo porque:
+\begin{enumerate}
+    \item Modelos preentrenados pequeños ($<$10MB cada uno)
+    \item Inferencia toma 1-5ms por modelo
+    \item scikit-learn y XGBoost liberan GIL durante \texttt{predict\_proba()}
+    \item Overhead de multiprocessing ($\sim$50ms) superaría el tiempo total de inferencia
+\end{enumerate}
+
+\subsubsection{Código de Implementación}
+
+\begin{lstlisting}[language=Python, caption=Implementación completa de predicción paralela]
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import time
+
+def predict_parallel(self, input_data):
+    X = self.scaler.transform(input_data)
+    results = {}
+    durations = {}
+    
+    with ThreadPoolExecutor(max_workers=len(self.models)) as executor:
+        # Enviar todas las tareas
+        future_to_model = {
+            executor.submit(self.predict_single_model, name, model, X): name
+            for name, model in self.models.items()
+        }
+        
+        # Recolectar resultados conforme completan
+        for future in as_completed(future_to_model):
+            result = future.result()
+            model_name = result['model']
+            results[model_name] = result['probability']
+            durations[model_name] = result['duration']
+    
+    # Ensemble: promedio simple de probabilidades
+    ensemble_prob = np.mean(list(results.values()))
+    
+    # Confianza: basada en desviacion estandar
+    # Baja std = alta concordancia entre modelos = alta confianza
+    confidence = 1 - np.std(list(results.values()))
+    
+    return {
+        'individual_predictions': results,
+        'ensemble_prediction': float(ensemble_prob),
+        'ensemble_class': int(ensemble_prob >= 0.5),
+        'confidence': float(confidence),
+        'durations': durations,
+        'total_time': sum(durations.values())
+    }
+\end{lstlisting}
+
+\subsection{Stack Tecnológico}
+
+\begin{table}[H]
+\centering
+\caption{Tecnologías y bibliotecas utilizadas}
+\label{tab:tech_stack}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Componente} & \textbf{Tecnología} & \textbf{Versión} \\ \midrule
+Lenguaje & Python & 3.10 \\
+ML Framework & scikit-learn & 1.3.0 \\
+Boosting & XGBoost & 2.0.3 \\
+Balanceo de datos & imbalanced-learn & 0.11.0 \\
+Interfaz web & Streamlit & 1.29.0 \\
+Visualización & Plotly & 5.18.0 \\
+Serialización & joblib & 1.3.2 \\
+Paralelismo & concurrent.futures & (stdlib) \\
+Análisis datos & pandas, numpy & 2.1.0, 1.24.3 \\
+Ambiente virtual & Anaconda & 23.9.0 \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Metodología Experimental}
+
+\subsubsection{Diseño de Experimentos}
+
+\textbf{Experimento 1: Evaluación de Modelos Individuales}
+\begin{itemize}
+    \item \textbf{Objetivo:} Comparar desempeño de 6 algoritmos
+    \item \textbf{Métricas:} Accuracy, Precision, Recall, F1-Score, AUC-ROC
+    \item \textbf{Protocolo:} Train-test split 80/20, validación cruzada 5-fold
+\end{itemize}
+
+\textbf{Experimento 2: Análisis de Speedup Paralelo}
+\begin{itemize}
+    \item \textbf{Objetivo:} Cuantificar aceleración de threading
+    \item \textbf{Configuraciones:} Secuencial, 2-8 workers
+    \item \textbf{Repeticiones:} 100 iteraciones por configuración
+    \item \textbf{Métricas:} Tiempo medio, speedup, eficiencia, desviación estándar
+\end{itemize}
+
+\textbf{Experimento 3: Evaluación de Ensemble}
+\begin{itemize}
+    \item \textbf{Objetivo:} Validar que ensemble supera modelos individuales
+    \item \textbf{Protocolo:} Comparar métricas de ensemble vs cada modelo
+\end{itemize}
+
+\textbf{Experimento 4: Análisis de Feature Importance}
+\begin{itemize}
+    \item \textbf{Objetivo:} Identificar variables más predictivas
+    \item \textbf{Método:} Feature importance de Random Forest y SHAP values
+\end{itemize}
+
+\subsubsection{Hardware de Pruebas}
+
+\begin{table}[H]
+\centering
+\caption{Especificaciones del sistema de pruebas}
+\label{tab:hardware}
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Componente} & \textbf{Especificación} \\ \midrule
+CPU & Intel Core i7-10750H (6 cores, 12 threads) \\
+Frecuencia & 2.6 GHz base, 5.0 GHz turbo \\
+RAM & 16 GB DDR4-2933 MHz \\
+Storage & SSD NVMe 512 GB \\
+OS & Windows 11 Pro 64-bit \\
+Python & 3.10.12 \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\newpage

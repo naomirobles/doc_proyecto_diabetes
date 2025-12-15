@@ -1,0 +1,83 @@
+\section{Estado del Arte}
+
+\subsection{Predicción de Diabetes con Machine Learning}
+
+Múltiples estudios han explorado el uso de ML para predicción de diabetes, utilizando diversos algoritmos y datasets.
+
+\subsubsection{Trabajos Seminales}
+
+\textbf{Smith et al. (1988)} introdujeron el dataset Pima Indians Diabetes, uno de los más utilizados en investigación de ML médico. Aplicaron ADAP (Adaptive Learning Routine) logrando 76\% de precisión \cite{smith1988}.
+
+\textbf{Kaur y Kumari (2020)} compararon 10 algoritmos de ML sobre el dataset Pima, reportando que Random Forest alcanzó la mayor precisión (77.6\%) seguido de SVM (76.8\%) \cite{kaur2020}.
+
+\textbf{Zou et al. (2018)} propusieron un sistema de predicción basado en XGBoost optimizado con grid search, logrando 81.2\% de accuracy y AUC-ROC de 0.87 en el dataset Pima \cite{zou2018}.
+
+\subsubsection{Enfoques de Ensemble}
+
+\textbf{Dinh et al. (2019)} implementaron un ensemble de 5 algoritmos (Logistic Regression, SVM, Random Forest, Gradient Boosting, XGBoost) con voting scheme, alcanzando 84.3\% de precisión. Su trabajo destacó la superioridad de ensembles sobre modelos individuales \cite{dinh2019}.
+
+\textbf{Kumari y Chitra (2013)} desarrollaron un sistema de predicción temprana usando stacking ensemble, combinando predicciones de ANN, SVM y Naive Bayes mediante un meta-clasificador logístico. Reportaron 86.7\% de accuracy en validación cruzada \cite{kumari2013}.
+
+\subsubsection{Deep Learning}
+
+\textbf{Swapna et al. (2018)} exploraron CNN y LSTM para predicción de diabetes usando datos de monitoreo continuo de glucosa, logrando 95.7\% de precisión. Sin embargo, requirieron datasets significativamente más grandes ($>$10,000 muestras) \cite{swapna2018}.
+
+\subsubsection{Feature Engineering y Selección}
+
+\textbf{Maniruzzaman et al. (2018)} investigaron el impacto de feature selection usando métodos de PCA, Relief-F y Recursive Feature Elimination. Encontraron que seleccionar las 5 características más relevantes (glucosa, BMI, edad, DPF, presión arterial) mantuvo 95\% del poder predictivo mientras reducía complejidad \cite{maniruzzaman2018}.
+
+\subsection{Procesamiento Paralelo en ML Médico}
+
+\subsubsection{GPU Acceleration}
+
+\textbf{Raina et al. (2009)} demostraron speedups de 10-70x usando GPUs para entrenamiento de redes neuronales profundas en clasificación de imágenes médicas \cite{raina2009}.
+
+\textbf{Cano (2018)} implementó Random Forest paralelo en GPU para diagnóstico de cáncer, reduciendo tiempo de entrenamiento de 45 minutos a 3.2 minutos con precisión equivalente \cite{cano2018}.
+
+\subsubsection{Distributed Computing}
+
+\textbf{Dean et al. (2012)} presentaron DistBelief, un framework de entrenamiento distribuido de redes neuronales usado en Google para clasificación de imágenes a escala masiva \cite{dean2012}.
+
+\textbf{Chen et al. (2016)} desarrollaron la arquitectura distribuida de XGBoost que permite entrenamiento en clusters Spark/Hadoop, logrando speedup lineal hasta 32 nodos \cite{chen2016xgboost}.
+
+\subsubsection{Threading para Inferencia}
+
+\textbf{Wu et al. (2020)} compararon threading, multiprocessing y GPU para inferencia de modelos ML en dispositivos edge (IoT médico). Encontraron que threading con 4-8 workers era óptimo para modelos pequeños-medianos ($<$100MB), logrando speedup de 2.5-3.5x \cite{wu2020}.
+
+\subsection{Interfaces de Usuario para ML Médico}
+
+\subsubsection{Web Applications}
+
+\textbf{Kaggle Kernels y Google Colab} popularizaron notebooks interactivos para prototipado rápido, pero carecen de interfaces end-user.
+
+\textbf{Streamlit (2019)} emergió como framework líder para crear web apps de ML sin conocimientos de frontend. Ha sido usado en múltiples aplicaciones médicas:
+
+\begin{itemize}
+    \item Predicción de enfermedades cardiovasculares (Ahmed et al., 2021)
+    \item Clasificación de tumores cerebrales por imágenes MRI (Patel et al., 2022)
+    \item Análisis de radiografías COVID-19 (Singh et al., 2020)
+\end{itemize}
+
+\subsubsection{Explicabilidad (XAI)}
+
+\textbf{Lundberg y Lee (2017)} introdujeron SHAP (SHapley Additive exPlanations), método basado en teoría de juegos para explicar predicciones de cualquier modelo ML. SHAP visualiza la contribución de cada feature a la predicción individual, crucial para adopción clínica \cite{lundberg2017}.
+
+\subsection{Gaps en la Literatura}
+
+A pesar de los avances, persisten limitaciones:
+
+\begin{enumerate}
+    \item \textbf{Implementaciones incompletas:} Muchos estudios reportan resultados pero no proporcionan código reproducible o sistemas desplegables.
+    
+    \item \textbf{Falta de paralelismo en inferencia:} La mayoría se enfoca en paralelizar entrenamiento, no inferencia en tiempo real.
+    
+    \item \textbf{Interfaces limitadas:} Pocos trabajos integran ML con UIs profesionales aptas para usuarios no técnicos.
+    
+    \item \textbf{Análisis de speedup superficial:} Estudios de paralelismo rara vez miden overhead, eficiencia y escalabilidad rigurosamente.
+    
+    \item \textbf{Validación externa limitada:} Modelos entrenados en Pima Indians (población específica) no se validan en otras cohortes.
+\end{enumerate}
+
+\textbf{Contribución de este trabajo:} Integramos ensemble learning, paralelismo mediante threading, interfaz Streamlit profesional, análisis riguroso de speedup y documentación completa del pipeline, llenando múltiples gaps identificados.
+
+\newpage

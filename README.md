@@ -18,18 +18,19 @@ La extensión "LaTeX Workshop" para VS Code facilita enormemente la edición y c
 *   Ve a la vista de Extensiones (Ctrl+Shift+X).
 *   Busca "LaTeX Workshop" e instálala.
 
-### 3. Compilar `outlier_analysis.tex` desde VS Code
+### 3. Compilar `main.tex` desde VS Code
 
 Una vez que tengas MiKTeX instalado y la extensión de LaTeX Workshop en VS Code, puedes compilar el archivo:
 
 *   **Abrir el proyecto:** Abre la carpeta `diabetes-predictor` en VS Code.
-*   **Navegar al archivo:** Abre el archivo `docs/outlier_analysis.tex`.
+*   **Navegar al archivo:** Abre el archivo `main.tex`.
 *   **Compilar:**
-    *   Haz clic en el icono del "Biberón" (LaTeX Workshop) en la barra de actividades de VS Code.
+    *   Haz clic en el icono del LaTeX Workshop en la barra de actividades de VS Code.
     *   En la sección "Build LaTeX Project", haz clic en "Build LaTeX project".
     *   Alternativamente, puedes usar el atajo de teclado por defecto: `Ctrl+Alt+B`.
 *   **Ver el PDF:**
     *   Una vez compilado, puedes ver el PDF generado haciendo clic en el icono "View LaTeX PDF" (una lupa con un archivo PDF) en la barra de herramientas de LaTeX Workshop o usando el atajo `Ctrl+Alt+V`.
     *   El archivo `outlier_analysis.pdf` se generará en la carpeta `docs/`.
+    En caso de que no compilen las referencias bibliográficas y/o las tablas de contenido. Abre una nueva terminal en vs code y ejecuta el comando `pdflatex main.tex`.
 
 ---

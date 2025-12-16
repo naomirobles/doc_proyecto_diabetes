@@ -1,5 +1,69 @@
 % ==================== CASO DE APLICACIÓN ====================
 \section{Caso de Aplicación: Clínica Comunitaria}
+
+Con el objetivo de evaluar la viabilidad práctica del sistema de predicción de diabetes desarrollado, se propone su implementación en un escenario realista de atención primaria: una clínica comunitaria. Este tipo de institución representa un entorno idóneo para la adopción de herramientas de tamizaje asistidas por inteligencia artificial, debido a la alta prevalencia de enfermedades crónicas, recursos limitados y la necesidad de diagnósticos rápidos y preventivos.
+
 \subsection{Escenario Propuesto}
+
+El escenario de aplicación considera una clínica comunitaria de primer nivel de atención, ubicada en una zona urbana o semiurbana, que atiende diariamente a pacientes adultos para consultas generales, control de enfermedades crónicas y programas de prevención. En este contexto, el sistema de predicción de diabetes se utilizaría como una herramienta de apoyo durante el proceso de consulta médica o campañas de detección temprana.
+
+El flujo de uso propuesto es el siguiente:
+
+\begin{enumerate}
+    \item El personal de salud (médico general o enfermera capacitada) ingresa los datos clínicos básicos del paciente (edad, glucosa, presión arterial, IMC, antecedentes, entre otros) a través de la interfaz web del sistema.
+    \item El sistema ejecuta de manera paralela las inferencias de los modelos de aprendizaje automático utilizando la arquitectura de \textit{threading} implementada.
+    \item Se genera una predicción agregada (\textit{ensemble}) del riesgo de diabetes, junto con indicadores de confianza, visualizaciones interpretables y recomendaciones preventivas.
+    \item El resultado se utiliza como apoyo para decidir si el paciente requiere estudios de laboratorio adicionales, seguimiento médico o intervención temprana.
+\end{enumerate}
+
+Este enfoque permite reducir la dependencia inmediata de pruebas de laboratorio costosas, optimizar el tiempo de consulta y priorizar la atención de pacientes con mayor riesgo. Es importante destacar que el sistema no sustituye el diagnóstico médico, sino que funciona como una herramienta de tamizaje y apoyo a la toma de decisiones clínicas.
+
 \subsection{Requerimientos del Sistema}
+
+Para garantizar una implementación eficiente y sostenible del sistema en una clínica comunitaria, se identifican los siguientes requerimientos técnicos, operativos y de personal:
+
+\subsubsection*{Requerimientos de Hardware}
+
+\begin{itemize}
+    \item Computadora de escritorio o laptop con procesador multinúcleo (mínimo 4 núcleos).
+    \item Memoria RAM mínima de 8 GB.
+    \item Almacenamiento SSD con al menos 256 GB disponibles.
+    \item Conectividad a red local o acceso a Internet (opcional para despliegue local).
+\end{itemize}
+
+\subsubsection*{Requerimientos de Software}
+
+\begin{itemize}
+    \item Sistema operativo Windows, Linux o macOS.
+    \item Entorno de ejecución Python 3.10 o superior.
+    \item Bibliotecas de aprendizaje automático y visualización descritas en el stack tecnológico del proyecto.
+    \item Navegador web moderno para acceso a la interfaz Streamlit.
+\end{itemize}
+
+\subsubsection*{Requerimientos Operativos}
+
+\begin{itemize}
+    \item Capacitación básica del personal de salud en el uso e interpretación del sistema.
+    \item Protocolos claros sobre el uso de la predicción como herramienta de apoyo y no como diagnóstico definitivo.
+    \item Procedimientos para el manejo responsable de datos sensibles de pacientes.
+\end{itemize}
+
+Gracias al uso de procesamiento paralelo ligero mediante \textit{threading}, el sistema es capaz de responder en tiempos del orden de milisegundos, incluso en equipos de cómputo convencionales, lo que lo hace adecuado para entornos con recursos limitados.
+
 \subsection{Propuesta de Transferencia Tecnológica}
+
+La transferencia tecnológica del sistema se plantea como un proceso gradual y escalable que permita su adopción por instituciones de salud sin requerir inversiones elevadas en infraestructura. La propuesta contempla las siguientes etapas:
+
+\begin{enumerate}
+    \item \textbf{Piloto controlado}: Despliegue inicial del sistema en una clínica comunitaria seleccionada, utilizando datos simulados o anonimizados para validar funcionamiento, tiempos de respuesta y aceptación del personal.
+    
+    \item \textbf{Validación clínica}: Evaluación del desempeño del sistema con datos reales, comparando sus predicciones con diagnósticos confirmados por pruebas de laboratorio, bajo supervisión médica.
+    
+    \item \textbf{Ajuste y personalización}: Adaptación de umbrales de riesgo, mensajes de recomendación y visualizaciones de acuerdo con los protocolos clínicos locales.
+    
+    \item \textbf{Escalamiento}: Replicación del sistema en otras clínicas comunitarias o centros de salud, aprovechando la arquitectura modular y de bajo costo.
+\end{enumerate}
+
+Desde el punto de vista económico, la solución es altamente viable, ya que se basa en software de código abierto y hardware de propósito general. En términos de impacto social, la adopción del sistema puede contribuir a la detección temprana de diabetes, reducción de complicaciones a largo plazo y optimización de recursos en el sistema de salud.
+
+Finalmente, la arquitectura desarrollada es transferible a otros problemas de salud pública, como enfermedades cardiovasculares o hipertensión, lo que amplía su potencial de uso y refuerza su valor como herramienta tecnológica aplicable en entornos clínicos reales.

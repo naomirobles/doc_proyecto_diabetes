@@ -1,6 +1,27 @@
-% ==================== CONCLUSIONES ====================
 \section{Conclusiones}
+
+El presente proyecto demostró que la integración de técnicas de aprendizaje automático con procesamiento paralelo es una estrategia viable y efectiva para el desarrollo de sistemas de apoyo al diagnóstico médico. A través del diseño e implementación de un sistema de predicción de diabetes basado en un enfoque de \textit{ensemble learning} y ejecución concurrente de modelos, se logró reducir significativamente la latencia de inferencia sin comprometer la precisión diagnóstica. Los resultados obtenidos validan la pertinencia del uso de cómputo paralelo en aplicaciones médicas de tiempo casi real, especialmente en escenarios de tamizaje preventivo.
+
 \subsection{Aprendizajes Técnicos}
+
+Durante el desarrollo del proyecto se adquirieron aprendizajes técnicos relevantes en múltiples áreas. En primer lugar, se profundizó en la aplicación práctica de algoritmos de clasificación supervisada, destacando las fortalezas y limitaciones de modelos lineales, no lineales y basados en árboles para problemas médicos desbalanceados. Asimismo, se comprendió la importancia del preprocesamiento de datos, particularmente el manejo de valores faltantes, normalización y balanceo de clases mediante SMOTE, para garantizar modelos robustos y confiables.
+
+En el ámbito del cómputo paralelo, se aprendió a diseñar arquitecturas de inferencia concurrente utilizando \texttt{ThreadPoolExecutor}, analizando el impacto del Global Interpreter Lock (GIL) y justificando técnicamente el uso de \textit{threading} frente a \textit{multiprocessing}. Adicionalmente, se adquirió experiencia en la medición de métricas de rendimiento paralelo como speedup, eficiencia y overhead. Finalmente, el desarrollo de una interfaz interactiva con Streamlit permitió integrar modelos de ML en una aplicación usable, reforzando habilidades de despliegue y visualización de resultados interpretables.
+
 \subsection{Cumplimiento de Objetivos}
+
+El objetivo general del proyecto fue cumplido satisfactoriamente, al desarrollarse un sistema funcional de predicción de diabetes que combina aprendizaje automático, procesamiento paralelo e interfaz gráfica interactiva. Los objetivos específicos también fueron alcanzados, ya que se implementó un pipeline completo de preprocesamiento de datos, se entrenaron y optimizaron seis modelos de clasificación, y se construyó un \textit{ensemble} que superó el desempeño de varios modelos individuales.
+
+Asimismo, se logró implementar una arquitectura de inferencia paralela que redujo el tiempo de respuesta entre un 35 y 40 \% respecto a la ejecución secuencial. El análisis comparativo de rendimiento permitió validar empíricamente los beneficios del paralelismo, mientras que la evaluación de métricas de clasificación confirmó la calidad diagnóstica del sistema. Finalmente, la documentación detallada del proceso y los resultados cumple con los estándares de un reporte técnico-académico.
+
 \subsection{Recomendaciones para Implementación}
+
+Para una implementación práctica del sistema en entornos reales, se recomienda realizar una validación adicional con datasets más diversos que incluyan distintas poblaciones, géneros y contextos clínicos, con el fin de mejorar la generalización del modelo. Asimismo, es aconsejable ajustar los umbrales de decisión y las reglas de seguridad del \textit{ensemble} de acuerdo con políticas clínicas específicas, priorizando la reducción de falsos negativos en escenarios médicos críticos.
+
+Desde el punto de vista técnico, se sugiere desplegar el sistema en equipos con CPUs multinúcleo para aprovechar plenamente el paralelismo, así como monitorear continuamente el desempeño del sistema ante cargas concurrentes. También es recomendable capacitar a los usuarios finales en la interpretación de las predicciones y enfatizar que el sistema debe utilizarse únicamente como herramienta de apoyo y no como sustituto del diagnóstico médico profesional.
+
 \subsection{Trabajo Futuro}
+
+Como líneas de trabajo futuro, se plantea la integración de aceleración por GPU para evaluar mejoras adicionales en tiempo de inferencia, así como la exploración de arquitecturas distribuidas que permitan escalar el sistema a nivel institucional. Otra extensión relevante consiste en incorporar técnicas avanzadas de explicabilidad, como análisis SHAP a nivel individual en tiempo real, para fortalecer la confianza clínica en las predicciones.
+
+Adicionalmente, se propone validar el sistema con datos clínicos reales provenientes de instituciones de salud, así como extender la arquitectura a la predicción de otras enfermedades crónicas. Finalmente, la integración con sistemas de historiales clínicos electrónicos (EHR) y la implementación de mecanismos de auditoría y trazabilidad representan pasos clave para una eventual transferencia tecnológica y adopción en entornos médicos reales.
